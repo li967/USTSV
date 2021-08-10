@@ -40,17 +40,49 @@ WHERE
 	productLine LIKE "%Cars%";
     
 /*Report total payments for October 28, 2004.*/
-SELECT SUM(amount) subtotal FROM payments WHERE paymentDate = "2004-10-28";
+SELECT paymentDate, SUM(amount) subtotal FROM payments WHERE paymentDate = "2004-10-28";
 
 /*Report those payments greater than $100,000.*/
+SELECT * FROM payments WHERE amount > 100000;
 
-/*List the products in each product line.
-How many products in each product line?
-What is the minimum payment received?
-List all payments greater than twice the average payment.
-What is the average percentage markup of the MSRP on buyPrice?
-How many distinct products does ClassicModels sell?
-Report the name and city of customers who don't have sales representatives?
-What are the names of executives with VP or Manager in their title? Use the CONCAT function to combine the employee's first name and last name into a single field for reporting.
-Which orders have a value greater than $5,000?
-*/
+/*List the products in each product line.*/
+SELECT productName, productLine FROM products ORDER BY productline; 
+
+/*How many products in each product line?*/
+SELECT productline, COUNT(*) numberofProduct FROM products group by productLine;
+
+/*What is the minimum payment received?*/
+SELECT MIN(amount) FROM payments;
+
+/*List all payments greater than twice the average payment.*/
+SELECT * FROM payments 
+WHERE amount > 2 * (SELECT AVG(amount) FROM payments);
+
+/*What is the average percentage markup of the MSRP on buyPrice?*/
+SELECT AVG(MSRP/buyPrice) FROM products;
+
+/*How many distinct products does ClassicModels sell?*/
+SELECT COUNT(*) FROM products;
+
+/*Report the name and city of customers who don't have sales representatives?*/
+SELECT customerName, city FROM customers WHERE salesRepEmployeeNumber IS NULL;
+
+/*What are the names of executives with VP or Manager in their title?*/
+SELECT * FROM employees WHERE jobTitle REGEXP 'VP|Manager';
+
+/*Use the CONCAT function to combine the employee's first name and last name 
+into a single field for reporting.*/
+select * from employees;
+
+SELECT 
+	employeeNumber,
+	CONCAT(firstName, " ", lastName) fullName, 
+	extension, email, officeCode, reportsTo, jobTitle
+    From employees;
+
+/*Which orders have a value greater than $5,000?*/
+SELECT orderNumber, SUM(quantityOrdered * priceEach) orderValue 
+FROM orderdetails 
+GROUP BY orderNumber
+HAVING orderValue > 5000
+ORDER BY orderValue;
